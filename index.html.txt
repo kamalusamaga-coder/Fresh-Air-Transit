@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b6e4f" />
+  <meta name="description" content="Fresh Air Transit – Book HEPA-filtered intercity buses across Nigeria. Secure payment via Paystack & Flutterwave." />
+  <title>Fresh Air Transit – Smarter, Fresher Journeys</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚌</text></svg>" />
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <header role="banner">
+    <nav aria-label="Main navigation" class="nav">
+      <a href="/" class="logo" aria-label="Fresh Air Transit home">
+        <span aria-hidden="true">🌿</span> Fresh Air Transit
+      </a>
+      <ul class="nav-links">
+        <li><a href="#routes">Routes</a></li>
+        <li><a href="#how">How it works</a></li>
+        <li><a href="#tracking">Live tracking</a></li>
+        <li><a href="#book" class="btn-primary">Book now</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main" role="main">
+    <!-- HERO -->
+    <section class="hero" aria-labelledby="hero-title">
+      <h1 id="hero-title">Web-Based Transport System for Smarter, Fresher Journeys</h1>
+      <p class="lede">
+        Real routes, real air data. Book Abuja ↔ Yola (Adamawa), Gombe, Kano,
+        Girei/Jimeta, Mubi, Kaduna, and Jalingo. HEPA-filtered cabins, live GPS,
+        instant e-ticket in 45 seconds.
+      </p>
+      <div class="badges" role="list">
+        <span role="listitem" class="badge">🔒 Paystack & Flutterwave secured</span>
+        <span role="listitem" class="badge">🌬️ HEPA filtered</span>
+        <span role="listitem" class="badge">📍 Live GPS</span>
+      </div>
+      <a href="#book" class="btn-primary btn-large">Book your seat</a>
+    </section>
+
+    <!-- ROUTES -->
+    <section id="routes" aria-labelledby="routes-title">
+      <h2 id="routes-title">Real Nigeria Corridors</h2>
+      <p>Live pricing in NGN. Every route shows HEPA status and CO₂ in real time.</p>
+
+      <form role="search" aria-label="Filter routes" class="filter">
+        <label for="route-filter">Filter routes</label>
+        <input type="search" id="route-filter" placeholder="e.g. Abuja, Yola, Kano" autocomplete="off" />
+      </form>
+
+      <ul id="route-list" class="route-grid" aria-live="polite"></ul>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how" aria-labelledby="how-title">
+      <h2 id="how-title">How it works — book, pay, board</h2>
+      <ol class="steps">
+        <li>
+          <h3>1. Search &amp; book</h3>
+          <p>Pick a real route, date, and seats. Total is calculated live.</p>
+        </li>
+        <li>
+          <h3>2. Pay securely</h3>
+          <p>Paystack (NGN kobo) or Flutterwave (NGN). PCI DSS compliant.</p>
+        </li>
+        <li>
+          <h3>3. Get your e-ticket</h3>
+          <p>Instant QR code and PAID badge — shown in your booking history.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- BOOKING FORM -->
+    <section id="book" aria-labelledby="book-title">
+      <h2 id="book-title">Book a seat</h2>
+      <form id="booking-form" novalidate>
+        <div class="field">
+          <label for="route-select">Route</label>
+          <select id="route-select" required></select>
+        </div>
+
+        <div class="field">
+          <label for="travel-date">Travel date</label>
+          <input type="date" id="travel-date" required />
+        </div>
+
+        <div class="field">
+          <label for="passengers">Passengers (1–5)</label>
+          <input type="number" id="passengers" min="1" max="5" value="1" required />
+        </div>
+
+        <div class="field">
+          <label for="email">Email for e-ticket</label>
+          <input type="email" id="email" autocomplete="email" required />
+        </div>
+
+        <p id="form-error" class="error" role="alert" hidden></p>
+
+        <p class="total" aria-live="polite">
+          Total: <strong id="total">₦0</strong>
+        </p>
+
+        <button type="submit" class="btn-primary btn-large">Pay &amp; confirm</button>
+      </form>
+    </section>
+
+    <!-- LIVE TRACKING -->
+    <section id="tracking" aria-labelledby="tracking-title">
+      <h2 id="tracking-title">See the bus breathe, not just move</h2>
+      <p>Payments verified via webhook before boarding. Built for low-bandwidth, high-trust operations.</p>
+
+      <div class="cabin" aria-live="polite">
+        <p>Cabin: <strong id="cabin-temp">23.4°C</strong> •
+           HEPA <strong>99.97%</strong> •
+           CO₂ <strong id="cabin-co2">612 ppm</strong></p>
+        <p>Speed: <strong id="speed">62 km/h</strong> •
+           ETA: <strong id="eta">04:42 PM</strong></p>
+      </div>
+    </section>
+  </main>
+
+  <footer role="contentinfo">
+    <p>© <span id="year"></span> Fresh Air Transit • booking@freshairtransit.ng</p>
+    <p>Trusted by 50,000+ passengers • Rated 4.9/5</p>
+  </footer>
+
+  <script src="/app.js" type="module"></script>
+</body>
+</html>

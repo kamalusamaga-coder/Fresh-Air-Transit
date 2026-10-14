@@ -1,0 +1,138 @@
+// ---------- Data ----------
+const ROUTES = [
+  { id: "ABJ-YOL", from: "Abuja", to: "Yola (Adamawa)", duration: "8h 30m", km: 614, price: 18500, seats: 12, times: ["06:00","14:00","21:00"] },
+  { id: "YOL-ABJ", from: "Yola (Adamawa)", to: "Abuja", duration: "8h 30m", km: 614, price: 18500, seats: 18, times: ["06:30","15:00","22:00"] },
+  { id: "ABJ-GOM", from: "Abuja", to: "Gombe", duration: "6h", km: 460, price: 14000, seats: 6, times: ["07:00","13:30"] },
+  { id: "ABJ-KAN", from: "Abuja", to: "Kano", duration: "7h 30m", km: 560, price: 16000, seats: 9, times: ["05:30","11:00","16:30"] },
+  { id: "GIR-ABJ", from: "Girei / Jimeta", to: "Abuja", duration: "8h", km: 598, price: 17500, seats: 22, times: ["06:00","19:00"] },
+  { id: "YOL-MUB", from: "Yola", to: "Mubi", duration: "3h", km: 188, price: 5500, seats: 14, times: ["07:30","11:00","15:30"] },
+  { id: "ABJ-KAD", from: "Abuja", to: "Kaduna", duration: "3h", km: 205, price: 6500, seats: 31, times: ["06:00","09:00","12:00","16:00","18:30"] },
+  { id: "YOL-JAL", from: "Yola", to: "Jalingo", duration: "4h", km: 238, price: 7000, seats: 11, times: ["08:00","13:00"] },
+];
+
+// ---------- Helpers ----------
+const ngn = new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 });
+const $ = (sel, root = document) => root.querySelector(sel);
+
+// ---------- Render route cards ----------
+function renderRoutes(filter = "") {
+  const list = $("#route-list");
+  const q = filter.trim().toLowerCase();
+  const filtered = q
+    ? ROUTES.filter(r => (r.from + " " + r.to + " " + r.id).toLowerCase().includes(q))
+    : ROUTES;
+
+  list.innerHTML = filtered.map(r => `
+    <li class="route-card">
+      <h3>${escapeHtml(r.from)} → ${escapeHtml(r.to)}</h3>
+      <p class="meta">${r.id} • ${r.km} km • ${r.duration}</p>
+      <p class="meta">Departures: ${r.times.join(", ")}</p>
+      <p class="price">${ngn.format(r.price)}</p>
+      <span class="seats">${r.seats} seats left</span>
+    </li>
+  `).join("");
+
+  if (!filtered.length) {
+    list.innerHTML = `<li class="route-card"><p>No routes match “${escapeHtml(filter)}”.</p></li>`;
+  }
+}
+
+// Basic XSS-safe escaping for anything we inject
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[c]);
+}
+
+// ---------- Populate booking select ----------
+function populateRouteSelect() {
+  const sel = $("#route-select");
+  sel.innerHTML = ROUTES.map(r =>
+    `<option value="${r.id}">${escapeHtml(r.from)} → ${escapeHtml(r.to)} — ${ngn.format(r.price)}</option>`
+  ).join("");
+}
+
+// ---------- Live total ----------
+function updateTotal() {
+  const route = ROUTES.find(r => r.id === $("#route-select").value);
+  const pax = Math.max(1, Math.min(5, parseInt($("#passengers").value, 10) || 1));
+  const total = route ? route.price * pax : 0;
+  $("#total").textContent = ngn.format(total);
+}
+
+// ---------- Booking form ----------
+function handleBooking(e) {
+  e.preventDefault();
+  const err = $("#form-error");
+  err.hidden = true;
+
+  const route = ROUTES.find(r => r.id === $("#route-select").value);
+  const date = $("#travel-date").value;
+  const pax = parseInt($("#passengers").value, 10);
+  const email = $("#email").value.trim();
+
+  const problems = [];
+  if (!route) problems.push("Please select a route.");
+  if (!date || new Date(date) < new Date(new Date().toDateString())) problems.push("Choose a valid future travel date.");
+  if (!pax || pax < 1 || pax > 5) problems.push("Passengers must be between 1 and 5.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) problems.push("Enter a valid email address.");
+
+  if (problems.length) {
+    err.textContent = problems.join(" ");
+    err.hidden = false;
+    err.focus?.();
+    return;
+  }
+
+  // In production: POST to your server with CSRF token + Stripe/Paystack/Flutterwave
+  // On success, redirect to payment gateway.
+  const ref = "FAT-" + Date.now().toString(36).toUpperCase();
+  alert(
+    `Booking ready!\n\n` +
+    `Route: ${route.from} → ${route.to}\n` +
+    `Date: ${date}\n` +
+    `Passengers: ${pax}\n` +
+    `Total: ${ngn.format(route.price * pax)}\n` +
+    `Reference: ${ref}\n\n` +
+    `You would now be redirected to Paystack/Flutterwave.`
+  );
+}
+
+// ---------- Live tracking simulation ----------
+function tickTracking() {
+  const speed = 55 + Math.floor(Math.random() * 15);
+  const temp = (22 + Math.random() * 3).toFixed(1);
+  const co2 = 590 + Math.floor(Math.random() * 40);
+  $("#speed").textContent = speed + " km/h";
+  $("#cabin-temp").textContent = temp + "°C";
+  $("#cabin-co2").textContent = co2 + " ppm";
+}
+
+// ---------- Service worker (PWA / offline) ----------
+async function registerSW() {
+  if ("serviceWorker" in navigator) {
+    try {
+      await navigator.serviceWorker.register("/sw.js");
+    } catch (e) {
+      console.warn("SW registration failed:", e);
+    }
+  }
+}
+
+// ---------- Init ----------
+document.addEventListener("DOMContentLoaded", () => {
+  $("#year").textContent = new Date().getFullYear();
+  renderRoutes();
+  populateRouteSelect();
+  updateTotal();
+
+  $("#route-filter").addEventListener("input", e => renderRoutes(e.target.value));
+  $("#route-select").addEventListener("change", updateTotal);
+  $("#passengers").addEventListener("input", updateTotal);
+  $("#booking-form").addEventListener("submit", handleBooking);
+
+  tickTracking();
+  setInterval(tickTracking, 4000);
+
+  registerSW();
+});
